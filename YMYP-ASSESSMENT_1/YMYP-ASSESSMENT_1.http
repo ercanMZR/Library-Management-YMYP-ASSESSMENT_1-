@@ -1,0 +1,6 @@
+@YMYP_ASSESSMENT_1_HostAddress = http://localhost:5298
+
+GET {{YMYP_ASSESSMENT_1_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

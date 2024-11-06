@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using YMYP_ASSESSMENT_1.Models.Repositories.Entities;
+using YMYP_ASSESSMENT_1.Models.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<BookService>();//Interfacesiz ekliyorum çünkü unittest yazmýyacaðým.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

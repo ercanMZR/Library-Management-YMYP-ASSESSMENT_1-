@@ -8,6 +8,12 @@ namespace YMYP_ASSESSMENT_1.Models.Services
 
         Task<ServiceResult<BookDto>> Get(int id);
 
-      
+        Task<ServiceResult<AddBookResponse>> AddAsync(AddBookRequest request);
+
+        Task<ServiceResult> UpdateAsync(UpdateBookRequest request);
+
+        Task<ServiceResult> DeleteAsync(int id);
+
+
     }
 }

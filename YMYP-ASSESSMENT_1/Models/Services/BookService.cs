@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Reflection;
 using YMYP_ASSESSMENT_1.Models.Repositories.Entities;
 using YMYP_ASSESSMENT_1.Models.Services;
 using YMYP_ASSESSMENT_1.Models.Services.Dtos;
@@ -59,5 +61,54 @@ namespace YMYP_ASSESSMENT_1.Models.Services
             };
             return ServiceResult<BookDto>.Success(bookAsDto);
         }
+        public async Task<ServiceResult<AddBookResponse>> AddAsync(AddBookRequest request)
+        {
+            var book = new Book()
+            {
+                Title = request.Title,
+                Author = request.Author,
+                PublicationYear = request.PublicationYear,
+                ISBN = request.ISBN,
+                Genre = request.Genre,
+                Publisher = request.Publisher,
+                PageCount = request.PageCount,
+                Language = request.Language,
+                Summary = request.Summary,
+                AvailableCopies = request.AvailableCopies
+
+
+            };
+
+            var newBook = await bookRepository.AddAsync(book);
+            var response = new AddBookResponse(newBook.Id);
+            return ServiceResult<AddBookResponse>.Success(response, HttpStatusCode.Created);
+        }
+        public async Task<ServiceResult> UpdateAsync(UpdateBookRequest request)
+        {
+            var bookToUpdate = new Book
+            {
+                Id = request.Id,
+                Title = request.Title,
+                Author = request.Author,
+                ISBN = request.ISBN,
+                Genre = request.Genre,
+                Publisher = request.Publisher,
+                PageCount = (int)request.PageCount,
+                Language = request.Language,
+                Summary = request.Summary,
+                AvailableCopies = (int)request.AvailableCopies
+            };
+
+            await bookRepository.UpdateAsync(bookToUpdate);
+
+            return ServiceResult.Success(HttpStatusCode.NoContent);
+        }
+
+        public async Task<ServiceResult> DeleteAsync(int id)
+        {
+            await bookRepository.DeleteAsync(id);
+            return ServiceResult.Success(HttpStatusCode.NoContent);
+        }
+
     }
 }

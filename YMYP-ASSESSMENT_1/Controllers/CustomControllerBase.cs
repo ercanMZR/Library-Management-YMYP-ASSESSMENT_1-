@@ -8,7 +8,7 @@ namespace YMYP_ASSESSMENT_1.Controllers
     public class CustomControllerBase : ControllerBase
     {
         [NonAction]
-        public IActionResult CrreateObjectResult<T>(ServiceResult<T> serviceResult)
+        public IActionResult CreateObjectResult<T>(ServiceResult<T> serviceResult)
         {
             if (serviceResult.Status == HttpStatusCode.NoContent)
             {

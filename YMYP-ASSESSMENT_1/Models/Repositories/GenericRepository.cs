@@ -48,6 +48,12 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories
             var entity = await DbSet.FindAsync(id);
             DbSet.Remove(entity);
         }
+
+
+        public Task<int> SaveChangesAsync()
+        {
+            return context.SaveChangesAsync();
+        }
     }
 
 

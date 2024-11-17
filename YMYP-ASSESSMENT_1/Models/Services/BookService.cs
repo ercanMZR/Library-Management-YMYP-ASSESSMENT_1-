@@ -1,69 +1,66 @@
-﻿using Azure;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Reflection;
+﻿using System.Net;
+using YMYP_ASSESSMENT_1.Models.Repositories;
 using YMYP_ASSESSMENT_1.Models.Repositories.Entities;
-using YMYP_ASSESSMENT_1.Models.Services;
 using YMYP_ASSESSMENT_1.Models.Services.Dtos;
 
 namespace YMYP_ASSESSMENT_1.Models.Services
 {
-    public class BookService(IBookRepository bookRepository):IBookService
+    public class BookService(IGenericRepository<Book> bookRepository, IUnitOfWork unitOfWork) : IBookService
     {
-      
-        public async Task<ServiceResult<List<BookDto>>>GetAllList()
-         {
-           var books = await bookRepository.GetAsync();
+       // private readonly IGenericRepository<Book> _bookRepository = bookRepository;
+        //private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-            var booksAsDto= new List<BookDto>();
-
-            books.ForEach(b =>
+        public async Task<ServiceResult<List<BookDto>>> GetAllList()
+        {
+            var books = await bookRepository.GetAsync();
+            if (books == null)
             {
-                booksAsDto.Add(new BookDto
-                {
-                  Id = b.Id,
-                    Author = b.Author,
-                    ISBN = b.ISBN,
-                    Genre = b.Genre,
-                    Language = b.Language,
-                    Summary = b.Summary,
-                    Title = b.Title,
-                    AvailableCopies = b.AvailableCopies,
-                    PublicationYear = b.PublicationYear,
-                    
-                });
-            });
+                return ServiceResult<List<BookDto>>.Success(Enumerable.Empty<BookDto>().ToList());
+            }
+
+            var booksAsDto = books.Select(b => new BookDto
+            {
+                Id = b.Id,
+                Author = b.Author,
+                ISBN = b.ISBN,
+                Genre = b.Genre,
+                Language = b.Language,
+                Summary = b.Summary,
+                Title = b.Title,
+                AvailableCopies = b.AvailableCopies,
+                PublicationYear = b.PublicationYear
+            }).ToList();
 
             return ServiceResult<List<BookDto>>.Success(booksAsDto);
         }
 
-
-        public async Task<ServiceResult<BookDto>>Get(int id)
+        public async Task<ServiceResult<BookDto>> Get(int id)
         {
-            var book =await bookRepository.GetAsync(id);
-
+            var book = await bookRepository.GetAsync(id);
             if (book == null)
             {
-                return ServiceResult<BookDto>.Failure("Book not found",HttpStatusCode.NotFound);
+                return ServiceResult<BookDto>.Failure("Book not found", HttpStatusCode.NotFound);
             }
 
-            var bookAsDto= new BookDto { 
-                Id = id,
+            var bookDto = new BookDto
+            {
+                Id = book.Id,
                 Author = book.Author,
                 ISBN = book.ISBN,
-                Genre = book.Genre,  
+                Genre = book.Genre,
                 Language = book.Language,
                 Summary = book.Summary,
                 Title = book.Title,
                 AvailableCopies = book.AvailableCopies,
-                PublicationYear = book.PublicationYear,
-                
+                PublicationYear = book.PublicationYear
             };
-            return ServiceResult<BookDto>.Success(bookAsDto);
+
+            return ServiceResult<BookDto>.Success(bookDto);
         }
+
         public async Task<ServiceResult<AddBookResponse>> AddAsync(AddBookRequest request)
         {
-            var book = new Book()
+            var book = new Book
             {
                 Title = request.Title,
                 Author = request.Author,
@@ -75,14 +72,15 @@ namespace YMYP_ASSESSMENT_1.Models.Services
                 Language = request.Language,
                 Summary = request.Summary,
                 AvailableCopies = request.AvailableCopies
-
-
             };
 
-            var newBook = await bookRepository.AddAsync(book);
-            var response = new AddBookResponse(newBook.Id);
+              bookRepository.Add(book);
+             await unitOfWork.SaveChanges();
+
+            var response = new AddBookResponse(book.Id);
             return ServiceResult<AddBookResponse>.Success(response, HttpStatusCode.Created);
         }
+
         public async Task<ServiceResult> UpdateAsync(UpdateBookRequest request)
         {
             var bookToUpdate = new Book
@@ -99,7 +97,8 @@ namespace YMYP_ASSESSMENT_1.Models.Services
                 AvailableCopies = (int)request.AvailableCopies
             };
 
-            await bookRepository.UpdateAsync(bookToUpdate);
+            bookRepository.Update(bookToUpdate);
+            await unitOfWork.SaveChanges();
 
             return ServiceResult.Success(HttpStatusCode.NoContent);
         }
@@ -107,8 +106,8 @@ namespace YMYP_ASSESSMENT_1.Models.Services
         public async Task<ServiceResult> DeleteAsync(int id)
         {
             await bookRepository.DeleteAsync(id);
+            await unitOfWork.SaveChanges();
             return ServiceResult.Success(HttpStatusCode.NoContent);
         }
-
     }
 }

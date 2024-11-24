@@ -12,6 +12,6 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories
         void Update(T entity);
         IQueryable<T> Where(Func<T, bool> predicate);
 
-        Task<int> SaveChangesAsync();
+
     }
 }

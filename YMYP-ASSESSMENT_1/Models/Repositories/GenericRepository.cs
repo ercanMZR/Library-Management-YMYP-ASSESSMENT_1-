@@ -13,7 +13,7 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories
             return DbSet.Where(predicate).AsQueryable();
         }
 
-        //Asqueryable dataları veritabanına yansıtmadan dönüyor.Orderbydan sonra tolistle vetitabanına gidiyor.Bu şkeilde sistmei yormuyoruz.İşlemi Sql e yaptırıyoruz.
+        //Asqueryable dataları veritabanına yansıtmadan dönüyor.Orderbydan sonra tolistle vetitabanına gidiyor.Bu şkeilde sistemi yormuyoruz.İşlemi Sql e yaptırıyoruz.
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
         {
             return await DbSet.AnyAsync(predicate);
@@ -50,10 +50,7 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories
         }
 
 
-        public Task<int> SaveChangesAsync()
-        {
-            return context.SaveChangesAsync();
-        }
+      
     }
 
 

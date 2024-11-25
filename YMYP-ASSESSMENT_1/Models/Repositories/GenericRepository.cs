@@ -4,9 +4,10 @@ using YMYP_ASSESSMENT_1.Models.Repositories.Entities;
 
 namespace YMYP_ASSESSMENT_1.Models.Repositories
 {
-    public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> where T : class
+     public class GenericRepository<T>(AppDbContext context) : IGenericRepository<T> where T : class
     {
         public readonly DbSet<T> DbSet = context.Set<T>();
+
 
         public IQueryable<T> Where(Func<T, bool> predicate)
         {
@@ -49,9 +50,14 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories
             DbSet.Remove(entity);
         }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate = null ! )
+        {
+            return predicate==null ? await DbSet.CountAsync() : await DbSet.CountAsync(predicate);
 
+            //predicate==null eğer koşul sağlanmışsa tüm kayıtların sayısını hesaplar.
+        }
       
     }
 
-
+  
 }

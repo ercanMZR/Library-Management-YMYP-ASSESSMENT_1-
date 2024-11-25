@@ -3,29 +3,37 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace YMYP_ASSESSMENT_1.Models.Repositories.Entities
 {
-    public class BookRepository(AppDbContext context) :IBookRepository
 
+
+    public class BookRepository : GenericRepository<Book>, IBookRepository
     {
+     
+
+        public BookRepository(AppDbContext context) : base(context)
+        {
+           
+        }
+
         public async Task<List<Book>> GetAsync()
         {
-            return await context.Books.ToListAsync();
+            return await DbSet.ToListAsync();
         }
 
         public async Task<Book?> GetAsync(int id)
         {
-            return await context.Books.FindAsync(id);
+            return await DbSet.FindAsync(id);
         }
 
         public async Task<Book> AddAsync(Book book)
         {
-            await context.Books.AddAsync(book);
+            await DbSet.AddAsync(book);
             await context.SaveChangesAsync();
             return book;
         }
 
         public async Task<Book?> UpdateAsync(Book book)
         {
-            var existingBook = await context.Books.FindAsync(book.Id);
+            var existingBook = await DbSet.FindAsync(book.Id);
             if (existingBook == null)
             {
                 return null;
@@ -41,24 +49,26 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories.Entities
             existingBook.Summary = book.Summary;
             existingBook.AvailableCopies = book.AvailableCopies;
 
-            context.Books.Update(existingBook);
-            await context.SaveChangesAsync();
+            DbSet.Update(existingBook);
+            await context.SaveChangesAsync();//base.context diye yazarsak
             return existingBook;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var book = await context.Books.FindAsync(id);
+            var book = await DbSet.FindAsync(id);
             if (book == null)
             { return false; }
 
-            context.Books.Remove(book);
+            DbSet.Remove(book);
             await context.SaveChangesAsync();
             return true;
         }
 
+        
 
     }
+   
 
   
 }

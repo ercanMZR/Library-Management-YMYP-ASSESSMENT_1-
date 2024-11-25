@@ -8,10 +8,10 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories.Entities
     public class BookRepository : GenericRepository<Book>, IBookRepository
     {
      
-
+       public readonly AppDbContext _context;
         public BookRepository(AppDbContext context) : base(context)
         {
-           
+           _context = context;
         }
 
         public async Task<List<Book>> GetAsync()
@@ -27,7 +27,7 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories.Entities
         public async Task<Book> AddAsync(Book book)
         {
             await DbSet.AddAsync(book);
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return book;
         }
 
@@ -50,7 +50,7 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories.Entities
             existingBook.AvailableCopies = book.AvailableCopies;
 
             DbSet.Update(existingBook);
-            await context.SaveChangesAsync();//base.context diye yazarsak
+            await _context.SaveChangesAsync();//base.context diye yazarsak
             return existingBook;
         }
 
@@ -61,7 +61,7 @@ namespace YMYP_ASSESSMENT_1.Models.Repositories.Entities
             { return false; }
 
             DbSet.Remove(book);
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return true;
         }
 
